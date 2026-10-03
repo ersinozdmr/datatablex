@@ -40,3 +40,33 @@ jobs:
 
       - name: Typecheck, lint, test, build
         run: pnpm turbo run typecheck lint test build
+
+      - name: Verify package exports and type resolution (publint + attw)
+        # The `exports` map and the ESM and CJS type declarations are part of the published contract.
+        run: |
+          for dir in packages/*/; do
+            (cd "$dir" && pnpm exec publint --strict && pnpm exec attw --pack . --profile node16)
+          done
+
+      - name: Verify @datatablex/core has zero runtime dependencies
+        run: |
+          deps=$(node -p "JSON.stringify(require('./packages/core/package.json').dependencies || {})")
+          if [ "$deps" != "{}" ]; then
+            echo "::error::@datatablex/core must not declare runtime dependencies, found: $deps"
+            exit 1
+          fi
+
+      - name: Verify published tarballs include README and LICENSE
+        # A consumer reads the usage contract and the license from inside the installed package.
+        run: |
+          for dir in packages/*/; do
+            (cd "$dir" && npm pack --dry-run --json) > /tmp/pack.json
+            missing=$(node -e "
+              const files = JSON.parse(require('fs').readFileSync('/tmp/pack.json', 'utf8'))[0].files.map((f) => f.path);
+              console.log(['README.md', 'LICENSE'].filter((f) => !files.includes(f)).join(', '));
+            ")
+            if [ -n "$missing" ]; then
+              echo "::error::${dir} tarball is missing: $missing"
+              exit 1
+            fi
+          done
