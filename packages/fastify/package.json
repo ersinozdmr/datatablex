@@ -1,0 +1,89 @@
+{
+  "name": "@datatablex/fastify",
+  "version": "0.1.0",
+  "description": "Fastify and Kysely query engine for DataTableX: an allowlisted field config, a ready-made route, query to SQL translation and streaming export.",
+  "keywords": [
+    "datatable",
+    "data-table",
+    "fastify",
+    "kysely",
+    "postgresql",
+    "server-side",
+    "pagination",
+    "filter",
+    "export"
+  ],
+  "author": "Ersin Ozdemir (https://github.com/ersinozdmr)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ersinozdmr/datatablex.git",
+    "directory": "packages/fastify"
+  },
+  "homepage": "https://github.com/ersinozdmr/datatablex/tree/main/packages/fastify#readme",
+  "bugs": {
+    "url": "https://github.com/ersinozdmr/datatablex/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "fastify": "^5.0.0",
+    "kysely": ">=0.28.17 <0.30.0",
+    "exceljs": "^4.4.0",
+    "pdfkit": ">=0.20.0 <1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "exceljs": {
+      "optional": true
+    },
+    "pdfkit": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@datatablex/core": "workspace:^",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/pdfkit": "^0.17.6",
+    "exceljs": "^4.4.0",
+    "fastify": "^5.2.0",
+    "kysely": "^0.28.17",
+    "pdfkit": "^0.20.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.11"
+  }
+}
