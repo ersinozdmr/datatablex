@@ -1,0 +1,37 @@
+{
+  "name": "datatablex",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "deps": "pnpm install --prefer-offline --reporter=silent",
+    "build": "pnpm run deps && turbo run build",
+    "typecheck": "pnpm run deps && turbo run typecheck",
+    "lint": "pnpm run deps && turbo run lint",
+    "test": "pnpm run deps && turbo run test",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run test",
+    "dev": "pnpm run deps && turbo run dev --parallel",
+    "check:language": "node scripts/check-language.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.9.6",
+    "turbo": "^2.10.12",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "exceljs>uuid": "^11.1.1",
+      "brace-expansion@<1.1.21": "^1.1.21",
+      "brace-expansion@>=4.0.0 <5.0.12": "^5.0.12"
+    }
+  }
+}
