@@ -4,3 +4,5 @@
 # One entry per line: an exact path, or a pattern where `*` matches within one
 # path segment and `**` matches across segments.
 packages/core/src/__tests__/filterParam.test.ts
+README.md
+packages/*/README.md
