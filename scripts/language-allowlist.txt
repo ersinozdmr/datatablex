@@ -1,0 +1,5 @@
+# Files that may contain Turkish letters: the Turkish locale and the tests and
+# fixtures that cover Turkish-character handling. Everything else is English.
+#
+# One entry per line: an exact path, or a pattern where `*` matches within one
+# path segment and `**` matches across segments.
