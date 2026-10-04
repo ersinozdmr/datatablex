@@ -22,7 +22,7 @@ A useful report includes:
 - steps to reproduce it, or a minimal proof of concept
 - any configuration that is required to trigger it
 
-We aim to acknowledge a report within a week. Once the problem is confirmed, a fix is prepared in a private advisory and released as a patch version, and the advisory is published together with the release.
+Every report is read and answered. Once the problem is confirmed, a fix is prepared in a private advisory and released as a patch version, and the advisory is published together with the release.
 
 ## Scope
 
