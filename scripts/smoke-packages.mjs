@@ -27,6 +27,10 @@
 // Node (since CVE-2024-27980) does not run a `.cmd` without a shell; the system's bsdtar is used
 // as `tar` (Git's GNU tar takes a `C:\...` path for a remote machine).
 //
+// With SMOKE_REGISTRY_VERSION set (for example `SMOKE_REGISTRY_VERSION=0.1.0 node scripts/smoke-packages.mjs`), the
+// tarballs are downloaded from the npm registry instead of being packed from the workspace, so the same scenarios
+// check what was actually published.
+//
 // The code examples of the root README are part of the check: its `tsx` blocks are type-checked in the antd
 // project and its `ts` blocks in the node project, so the quick start cannot drift from the published API.
 import { execFileSync, execSync } from "node:child_process";
@@ -81,10 +85,15 @@ const readmeExamples = (language) => {
   return Object.fromEntries(blocks.map((source, index) => [`readme-${index + 1}.${language}`, source]));
 };
 
+const registryVersion = process.env.SMOKE_REGISTRY_VERSION;
+
 try {
+  mkdirSync(tarballs, { recursive: true });
   for (const pkg of ["core", "react", "antd", "fastify"]) {
-    run(tool("pnpm"), ["pack", "--pack-destination", tarballs], path.join(root, "packages", pkg));
+    if (registryVersion) run(tool("npm"), ["pack", `@datatablex/${pkg}@${registryVersion}`, "--pack-destination", tarballs], work);
+    else run(tool("pnpm"), ["pack", "--pack-destination", tarballs], path.join(root, "packages", pkg));
   }
+  console.log(registryVersion ? `Source: npm registry, version ${registryVersion}` : "Source: workspace build");
   const tgz = Object.fromEntries(
     readdirSync(tarballs).map((file) => [file.replace(/^datatablex-(\w+)-.*$/, "$1"), path.join(tarballs, file)]),
   );
@@ -162,7 +171,8 @@ export const Options = () => <DataTable<Row> dataSource={dataSource} columns={co
   run(tar, ["-xzf", tgz.react, "-C", unpacked]);
   const reactManifestPath = path.join(unpacked, "package", "package.json");
   const reactManifest = JSON.parse(readFileSync(reactManifestPath, "utf8"));
-  const [major, minor, patch] = reactManifest.version.split(".").map(Number);
+  // The next patch version; a pre-release suffix such as `-rc.0` is dropped.
+  const [, major, minor, patch] = /^(\d+)\.(\d+)\.(\d+)/.exec(reactManifest.version).map(Number);
   reactManifest.version = `${major}.${minor}.${patch + 1}`;
   writeFileSync(reactManifestPath, JSON.stringify(reactManifest));
   run(tar, ["-czf", bumpedReact, "-C", unpacked, "package"]);
