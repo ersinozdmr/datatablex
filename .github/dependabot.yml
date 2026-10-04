@@ -12,6 +12,9 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # The PDF adapter of @datatablex/react supports exactly this version; see the README of that package.
+      - dependency-name: pdfmake
 
   - package-ecosystem: github-actions
     directory: "/"
