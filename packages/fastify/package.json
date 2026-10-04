@@ -82,7 +82,7 @@
     "kysely": "^0.28.17",
     "pdfkit": "^0.20.2",
     "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.11"
   }
 }
