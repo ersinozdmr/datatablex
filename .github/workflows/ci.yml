@@ -18,6 +18,22 @@ jobs:
       group: ci-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
+    # The end-to-end tests of the example application need a real PostgreSQL. A service container is used
+    # here; `apps/example/docker-compose.yml` is for local development only.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: datatablex
+          POSTGRES_PASSWORD: datatablex
+          POSTGRES_DB: datatablex_example
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U datatablex -d datatablex_example"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -40,6 +56,15 @@ jobs:
 
       - name: Typecheck, lint, test, build
         run: pnpm turbo run typecheck lint test build
+
+      - name: Check bundle size budget
+        run: pnpm size
+
+      - name: Smoke-install packed tarballs in clean projects
+        # Installs the four tarballs into clean projects: a consumer that uses only the hook builds without antd,
+        # exceljs or pdfmake; the Ant Design components and the Excel adapter build with their own peers; core and
+        # fastify load in Node as both ESM and CommonJS.
+        run: pnpm smoke
 
       - name: Verify package exports and type resolution (publint + attw)
         # The `exports` map and the ESM and CJS type declarations are part of the published contract.
@@ -70,3 +95,14 @@ jobs:
               exit 1
             fi
           done
+
+      # Firefox and WebKit run only the scenarios tagged `@cross-browser` (native download and export cancel);
+      # see `apps/example/playwright.config.ts`.
+      - name: Install Playwright browsers
+        run: pnpm --filter example exec playwright install --with-deps chromium firefox webkit
+
+      - name: Run end-to-end tests
+        run: pnpm --filter example test:e2e
+        env:
+          # Matches the port mapping of the `postgres` service above and `apps/example/.env.example`.
+          DATABASE_URL: postgres://datatablex:datatablex@localhost:55432/datatablex_example

@@ -14,7 +14,9 @@
     "test": "pnpm run deps && turbo run test",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run test",
     "dev": "pnpm run deps && turbo run dev --parallel",
-    "check:language": "node scripts/check-language.mjs"
+    "check:language": "node scripts/check-language.mjs",
+    "size": "node scripts/check-bundle-size.mjs",
+    "smoke": "node scripts/smoke-packages.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
