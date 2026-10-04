@@ -8,3 +8,5 @@ README.md
 packages/*/README.md
 packages/fastify/src/__tests__/export.test.ts
 packages/fastify/src/__tests__/exportFormats.test.ts
+packages/react/src/__tests__/exportFile.test.ts
+packages/react/src/__tests__/urlState.test.ts
