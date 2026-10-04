@@ -1,6 +1,6 @@
 {
   "name": "@datatablex/fastify",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "description": "Fastify and Kysely query engine for DataTableX: an allowlisted field config, a ready-made route, query to SQL translation and streaming export.",
   "keywords": [
     "datatable",

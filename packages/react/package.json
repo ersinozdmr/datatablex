@@ -1,6 +1,6 @@
 {
   "name": "@datatablex/react",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "description": "Headless useDataTable hook for DataTableX, with REST and local data sources, URL sync and export. UI library independent; see @datatablex/antd for Ant Design components.",
   "keywords": [
     "datatable",

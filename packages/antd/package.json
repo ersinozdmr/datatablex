@@ -1,6 +1,6 @@
 {
   "name": "@datatablex/antd",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "description": "Ant Design v5 components for DataTableX: <DataTable>, a filter bar and an advanced filter builder, a column menu and an export menu.",
   "keywords": [
     "datatable",
