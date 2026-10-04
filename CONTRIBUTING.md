@@ -52,12 +52,25 @@ pnpm --filter example test:e2e           # migrates, seeds, builds the client an
 
 1. Create a branch from `main`.
 2. Make the change, with tests that cover it.
-3. Run `pnpm check` and `pnpm check:language`.
-4. Open a pull request against `main` and fill in the template.
+3. Add a changeset if you changed a published package (see below).
+4. Run `pnpm check` and `pnpm check:language`.
+5. Open a pull request against `main` and fill in the template.
 
 Keep a pull request focused on one change. A bug fix comes with a test that fails without the fix. A change to behavior or to the public API updates the documentation in the same pull request.
 
 For a larger change, open an issue first so the approach can be agreed before you write the code.
+
+## Changesets
+
+Releases are managed with [Changesets](https://github.com/changesets/changesets). A pull request that changes a published package (`packages/*`) carries a changeset:
+
+```sh
+pnpm changeset
+```
+
+Pick the packages the change affects and the kind of release: `patch` for a fix, `minor` for a new feature or a breaking change while the packages are in `0.x` (see [STABILITY.md](STABILITY.md)). Write one sentence for the changelog, addressed to someone who uses the package. For a change that needs no release, such as a test or an internal refactor, run `pnpm changeset --empty`. CI fails a pull request that changes a package without a changeset.
+
+The four packages are released together and always share one version.
 
 ## Commit messages
 
