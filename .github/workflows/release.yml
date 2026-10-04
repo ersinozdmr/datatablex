@@ -1,0 +1,58 @@
+name: Release
+
+# Publishes the package versions on `main` that are not on npm yet, then pushes their git tags.
+#
+# It is started by hand from the Actions tab, after the pull request that sets the new versions
+# (`pnpm changeset version`) has been merged. Publishing uses npm trusted publishing: the job proves its
+# identity to npm with a short-lived OIDC token, so no npm token is stored in this repository. Each package
+# names this workflow file as its trusted publisher in its settings on npmjs.com.
+on:
+  workflow_dispatch:
+
+concurrency: release
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    # The release gate: the complete CI run, including the end-to-end tests, on the commit to be published.
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      # Pushes the version tags.
+      contents: write
+      # Lets the job request the OIDC token that npm trusted publishing checks.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Use an npm version that supports trusted publishing
+        # Trusted publishing needs npm 11.5.1 or later; Node 22 ships with npm 10.
+        run: npm install --global npm@11
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the packages
+        run: pnpm turbo run build --filter="./packages/*"
+
+      - name: Publish to npm
+        # Publishes every package whose version is not on the registry yet and creates a git tag for each.
+        run: pnpm changeset publish
+
+      - name: Push the version tags
+        run: git push origin --tags
