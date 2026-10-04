@@ -10,3 +10,5 @@ packages/fastify/src/__tests__/export.test.ts
 packages/fastify/src/__tests__/exportFormats.test.ts
 packages/react/src/__tests__/exportFile.test.ts
 packages/react/src/__tests__/urlState.test.ts
+packages/antd/src/locale.ts
+packages/antd/src/__tests__/locale.test.tsx
