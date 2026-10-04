@@ -59,6 +59,12 @@ jobs:
       - name: Build the packages
         run: pnpm turbo run build --filter="./packages/*"
 
+      - name: Set the git identity for the version tags
+        # The version tags are annotated tags, which need a tagger identity.
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Publish to npm
         # Publishes every package whose version is not on the registry yet and creates a git tag for each.
         run: pnpm changeset publish --tag "${{ inputs.tag }}"
