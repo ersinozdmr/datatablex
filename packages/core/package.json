@@ -1,6 +1,6 @@
 {
   "name": "@datatablex/core",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "description": "DataTableX wire contract: query/result types and zero-dependency helpers shared by frontend and backend.",
   "keywords": [
     "datatable",

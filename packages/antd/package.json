@@ -1,6 +1,6 @@
 {
   "name": "@datatablex/antd",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.0",
   "description": "Ant Design v5 components for DataTableX: <DataTable>, a filter bar and an advanced filter builder, a column menu and an export menu.",
   "keywords": [
     "datatable",
@@ -55,8 +55,8 @@
     "lint": "eslint ."
   },
   "peerDependencies": {
-    "@datatablex/core": "workspace:>=0.1.0 <1.0.0",
-    "@datatablex/react": "workspace:>=0.1.0 <1.0.0",
+    "@datatablex/core": "workspace:>=0.1.0-rc.0 <1.0.0",
+    "@datatablex/react": "workspace:>=0.1.0-rc.0 <1.0.0",
     "antd": "^5.20.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
