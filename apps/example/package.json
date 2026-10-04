@@ -1,0 +1,58 @@
+{
+  "name": "example",
+  "private": true,
+  "version": "0.0.0",
+  "description": "DataTableX example application: a Fastify API on a real PostgreSQL database plus a React and Ant Design client.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"pnpm run dev:server\" \"pnpm run dev:client\"",
+    "dev:server": "tsx watch src/server/index.ts",
+    "dev:client": "vite",
+    "build": "vite build",
+    "start": "tsx src/server/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "echo \"[example] no unit tests; see test:e2e\" && exit 0",
+    "test:e2e": "pnpm run db:migrate && pnpm run db:seed && playwright test",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "playwright:install": "playwright install --with-deps chromium",
+    "bench:export": "node --expose-gc --import tsx scripts/bench-export.ts"
+  },
+  "dependencies": {
+    "@datatablex/antd": "workspace:*",
+    "@datatablex/core": "workspace:*",
+    "@datatablex/fastify": "workspace:*",
+    "@datatablex/react": "workspace:*",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/static": "^10.1.5",
+    "antd": "^5.22.5",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "fastify": "^5.12.5",
+    "kysely": "^0.28.17",
+    "pdfkit": "^0.20.2",
+    "pg": "^8.13.1",
+    "pg-cursor": "^2.22.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.11.10",
+    "@types/pg-cursor": "^2.7.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.4.3"
+  }
+}

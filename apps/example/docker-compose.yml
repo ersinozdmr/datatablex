@@ -1,0 +1,25 @@
+name: datatablex-example
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: datatablex
+      POSTGRES_PASSWORD: datatablex
+      POSTGRES_DB: datatablex_example
+    ports:
+      # Fixed port, so that DATABASE_URL in .env.example always matches.
+      - "55432:5432"
+    volumes:
+      - datatablex-example-pgdata:/var/lib/postgresql/data
+      # The `pg_trgm` init script: the prerequisite of the GIN index on the searchable field is really installed in this environment.
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datatablex -d datatablex_example"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+volumes:
+  datatablex-example-pgdata:
