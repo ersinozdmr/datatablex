@@ -15,6 +15,11 @@ updates:
     ignore:
       # The PDF adapter of @datatablex/react supports exactly this version; see the README of that package.
       - dependency-name: pdfmake
+      # A minor release of a 0.x package can be breaking: the example application is written against Kysely 0.28,
+      # while the smoke test covers both ends of the range @datatablex/fastify supports.
+      - dependency-name: kysely
+        update-types:
+          - version-update:semver-minor
 
   - package-ecosystem: github-actions
     directory: "/"
