@@ -1,6 +1,6 @@
 # @datatablex/antd
 
-The Ant Design v5 interface of DataTableX: `<DataTable>`, a filter bar and an advanced filter builder, a column header menu, column management and an export menu. State and data access live in the `useDataTable` hook of [`@datatablex/react`](https://github.com/ersinozdemir/datatablex/blob/main/packages/react/README.md); this package only renders its public contract (`TableInstance`).
+The Ant Design v5 interface of DataTableX: `<DataTable>`, a filter bar and an advanced filter builder, a column header menu, column management and an export menu. State and data access live in the `useDataTable` hook of [`@datatablex/react`](https://github.com/ersinozdmr/datatablex/blob/main/packages/react/README.md); this package only renders its public contract (`TableInstance`).
 
 ## Installation
 
@@ -18,7 +18,7 @@ npm install @datatablex/antd @datatablex/react @datatablex/core antd react react
 
 Ant Design 5 is supported. Ant Design 6 is not supported yet.
 
-> **Version policy:** a minor release may add new keys to `DataTableLocale`. For a full translation use `{ ...enUS, ...overrides }` (a partial `locale` is not affected). Details: [API stability](https://github.com/ersinozdemir/datatablex/blob/main/STABILITY.md).
+> **Version policy:** a minor release may add new keys to `DataTableLocale`. For a full translation use `{ ...enUS, ...overrides }` (a partial `locale` is not affected). Details: [API stability](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md).
 
 ### If you use React 19
 
@@ -56,7 +56,7 @@ export function AccessLogsTable() {
 }
 ```
 
-`<DataTable>` takes one of two forms: the options of `useDataTable` (the component calls the hook itself) or a ready-made `table={useDataTable(...)}`. With the second form, `table.reload()`, `table.reset()` and controls outside the table are within reach. For URL sync (`syncWithUrl`) and `DataSource` details, see the [`@datatablex/react`](https://github.com/ersinozdemir/datatablex/blob/main/packages/react/README.md#url-sync-syncwithurl) documentation.
+`<DataTable>` takes one of two forms: the options of `useDataTable` (the component calls the hook itself) or a ready-made `table={useDataTable(...)}`. With the second form, `table.reload()`, `table.reset()` and controls outside the table are within reach. For URL sync (`syncWithUrl`) and `DataSource` details, see the [`@datatablex/react`](https://github.com/ersinozdmr/datatablex/blob/main/packages/react/README.md#url-sync-syncwithurl) documentation.
 
 ## Column roles
 
@@ -136,7 +136,7 @@ const columns: ReactDataTableColumn<AccessLog>[] = [
 Things to know:
 
 - **The conditions offered depend on `filterOperators`.** A condition is offered if all the wire operators it compiles to are enabled in the column's `filterOperators`. A column without `filterOperators` offers the default set: `contains` for text; `between`/`gte`/`lte` for numbers and for `date`; `gte`/`lt` for `datetime`; `in` for enum; `eq` for boolean. If you use `metaEndpoint`, the list is intersected with the backend permissions; a column left with no condition cannot be filtered.
-- **Enum options can come from the server** (experimental, see [API stability](https://github.com/ersinozdemir/datatablex/blob/main/STABILITY.md)). If a `type: "enum"` column has no `options` and the backend defines `options` for the field, the list is fetched once, when the value editor is first opened; while it waits, "Loading options…" is shown (`locale.optionsLoading`). If the list is empty or cannot be fetched, only the filter of that column is turned off (`locale.optionsUnavailable`). Options given by hand always take precedence.
+- **Enum options can come from the server** (experimental, see [API stability](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md)). If a `type: "enum"` column has no `options` and the backend defines `options` for the field, the list is fetched once, when the value editor is first opened; while it waits, "Loading options…" is shown (`locale.optionsLoading`). If the list is empty or cannot be fetched, only the filter of that column is turned off (`locale.optionsUnavailable`). Options given by hand always take precedence.
 - **`filterOperators` does not grant permission.** For a field that is `sensitive: true` on the backend (open to exact match only), give `filterOperators: ["eq"]`; the bar then offers only "equals".
 - **Keeping in line with the backend whitelist is the developer's contract.** If the operator of an offered condition is not enabled in `fields[field].filterOperators`, the request gets a `400`.
 - **Date conditions work at day granularity.** A `date` column sends the day as it is (`YYYY-MM-DD`). A `datetime` column produces a HALF-OPEN range in the column's `timezone`: "on a day" becomes `AND(gte start of day, lt start of next day)` (so that PostgreSQL microseconds do not slip through). For this reason, the `filterOperators` of a `datetime` field on the backend must include `gte` and `lt`.
@@ -208,7 +208,7 @@ The texts that take a column name (`columnMenu`, `minInput`, `moveUp` and so on)
 
 ## Export menu
 
-The `export` prop opens a menu in the toolbar where the user first chooses a scope (This page / Filtered rows / Selected rows) and then a format (CSV / Excel / PDF). The behavior of the engine (the server path and the native download, the client path, formula escaping, PDF layout) is in [the `@datatablex/react` README](https://github.com/ersinozdemir/datatablex/blob/main/packages/react/README.md#export).
+The `export` prop opens a menu in the toolbar where the user first chooses a scope (This page / Filtered rows / Selected rows) and then a format (CSV / Excel / PDF). The behavior of the engine (the server path and the native download, the client path, formula escaping, PDF layout) is in [the `@datatablex/react` README](https://github.com/ersinozdmr/datatablex/blob/main/packages/react/README.md#export).
 
 On an endpoint with server export enabled (`export.formats` of `@datatablex/fastify`), no adapter is needed for Excel and PDF; the server produces the file and the browser downloads it itself:
 
@@ -245,7 +245,7 @@ import { pdfExporter } from "@datatablex/react/pdf"; // requires pdfmake
 - While an export runs, the button shows a loading state and "Cancel" appears next to it (`table.cancelExport()`). On the client path, the button shows progress; on the server path, this state lasts only until the ticket is obtained, and progress and cancellation are in the browser's download interface.
 - The PDF title is `locale.exportDocumentTitle`.
 
-For the server side of export, see [`@datatablex/fastify`](https://github.com/ersinozdemir/datatablex/blob/main/packages/fastify/README.md#server-export-export). Server export requests are experimental; see [API stability](https://github.com/ersinozdemir/datatablex/blob/main/STABILITY.md).
+For the server side of export, see [`@datatablex/fastify`](https://github.com/ersinozdmr/datatablex/blob/main/packages/fastify/README.md#server-export-export). Server export requests are experimental; see [API stability](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md).
 
 ## License
 

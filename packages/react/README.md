@@ -46,7 +46,7 @@ export function AccessLogsList() {
 
 The `dataSource` and `columns` references must be stable (constant at module level, or wrapped in `useMemo`). On a screen that changes `dataSource` on purpose, pass `dataSourceKey`; a change of identity alone does not trigger a new query.
 
-For serverless prototypes and tests, `createLocalDataSource(rows, columns)` implements the same `DataSource` interface in memory. Its semantics are approximate: text matching and sorting are independent of locale, and limits are not applied. See the [`@datatablex/core` README](https://github.com/ersinozdemir/datatablex/blob/main/packages/core/README.md#queryinmemory-is-approximate) for the differences.
+For serverless prototypes and tests, `createLocalDataSource(rows, columns)` implements the same `DataSource` interface in memory. Its semantics are approximate: text matching and sorting are independent of locale, and limits are not applied. See the [`@datatablex/core` README](https://github.com/ersinozdmr/datatablex/blob/main/packages/core/README.md#queryinmemory-is-approximate) for the differences.
 
 When `createRestDataSource` is given a `metaEndpoint` (see `@datatablex/fastify`, "Meta route"), the table reads the backend's limits and field allowlist and only **narrows** itself with them: `maxSearchLength` and the chunk size of a selected-rows export cannot exceed the backend value; operators the backend does not allow are removed from the column (for example, a sensitive field that opens only `eq` offers only "equals"); sorting is turned off for a column the backend does not sort, and filtering is turned off for a column that has no operator left. By default the first query does not wait for the meta; when the meta arrives, the query is brought within the limits. With `awaitMeta: true` (or `{ timeoutMs }`) the first query waits for the meta, so a shared link opens with a single, already normalized request; if the meta cannot be read or the time (3 s by default) runs out, the table continues with the values given by hand. `createRestDataSource` fetches the meta once per instance (`dataSource.invalidateMeta()` empties the cache) and adds the `x-datatablex-protocol` header to every request; the meta of a server that reports a protocol we do not support is ignored. In development mode, columns that were turned off and a mismatch between `rowKey` and the backend `primaryKey` are reported as warnings.
 
@@ -80,7 +80,7 @@ const columns = [{ key: "status", title: "Status", type: "enum", filterable: tru
 
 ### `TableInstance`
 
-> **Version policy:** if you implement `TableInstance` by hand (a mock, a test wrapper), new members are added only as _optional_ in minor releases, and `<DataTable>` tolerates their absence. `DataSource.requestExport`, `DocumentExporter` and `/filter-model` are **experimental** (their shape may change during 0.x). Details: [API stability](https://github.com/ersinozdemir/datatablex/blob/main/STABILITY.md).
+> **Version policy:** if you implement `TableInstance` by hand (a mock, a test wrapper), new members are added only as _optional_ in minor releases, and `<DataTable>` tolerates their absence. `DataSource.requestExport`, `DocumentExporter` and `/filter-model` are **experimental** (their shape may change during 0.x). Details: [API stability](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md).
 
 The `TableInstance` returned by `useDataTable` is memoized: it gets a new identity only when something it carries changes. It is a complete controller contract for interfaces outside the table as well: `table.columns` (the columns narrowed by the endpoint meta), `table.rowKey`, `table.tableId`, `table.limits` (`maxSearchLength`; `maxFilterCount`, `maxFilterDepth` and `maxInValues` when there is a meta, otherwise `null`) and `table.searchRevision`. If you write your own search box:
 
@@ -125,7 +125,7 @@ const table = useDataTable({ dataSource, columns, rowKey: "id", lockedFilters: l
 
 ## Filter building blocks (`@datatablex/react/filter-model`)
 
-The UI-independent filter model; `@datatablex/antd` uses it as well. **Experimental** (`@experimental`): its shape may change during 0.x, even in a patch release, so pin the version if you use it in production ([API stability](https://github.com/ersinozdemir/datatablex/blob/main/STABILITY.md)). If you build a filter bar or builder with another UI kit:
+The UI-independent filter model; `@datatablex/antd` uses it as well. **Experimental** (`@experimental`): its shape may change during 0.x, even in a patch release, so pin the version if you use it in production ([API stability](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md)). If you build a filter bar or builder with another UI kit:
 
 - **Column roles:** rules and nodes are bound to a column by `field`; `columnsByField(columns)` gives this mapping (columns with `field: null` are left out; of columns that share a field, the first one wins).
 - **Rule model:** `FilterRule` (field + operator + value), `ruleOperatorsFor(column)` (the conditions to offer, by column type and `filterOperators`), `ruleToNode`/`nodeToRule` (rule to wire node and back; `datetime` day rules are compiled into a half-open `gte` + `lt` group in the column's `timezone`, and reversed ranges are put in order), `readEntries`/`writeEntries` (the rules of the root `AND` and the external nodes that are preserved).
@@ -296,7 +296,7 @@ await table.exportData("pdf", "currentPage", { title: "Access logs" });
 
 - The rows are collected in memory and the file is downloaded as a Blob. The export calls the same endpoint page by page; the first `allFiltered` request gets the total, and later requests carry `skipCount: true`. The selected-rows chunk size is `exportChunkSize: 500`. `exportProgress` reports progress.
 - **Ceiling:** if an `allFiltered`/`selected` export exceeds `maxClientExportRows`, the result is `ExportRowLimitError` (`source: "client"`, `format`). The defaults are 100 000 for CSV, 50 000 for Excel and 10 000 for PDF (measured: an Excel file of 100K rows takes about 700 MB, PDF generation freezes the tab, and CSV also keeps all rows, the row arrays, the single text and the Blob in memory). A number applies to all three formats, an object (`{ csv, excel, pdf }`) applies per format, and `Infinity` removes the ceiling on purpose. With wide cells the row count alone is not the memory limit; for large data, use the server path.
-- A format that has no registered adapter and is not produced by the server is rejected with an explicit error before any request is sent. For your own format you can implement `DocumentExporter` (`format`, `extension`, `mimeType`, `description`, `build(columns, rows, { title }) → Promise<Blob>`). **`DocumentExporter` is experimental** and may change during 0.x; see [STABILITY.md](https://github.com/ersinozdemir/datatablex/blob/main/STABILITY.md).
+- A format that has no registered adapter and is not produced by the server is rejected with an explicit error before any request is sent. For your own format you can implement `DocumentExporter` (`format`, `extension`, `mimeType`, `description`, `build(columns, rows, { title }) → Promise<Blob>`). **`DocumentExporter` is experimental** and may change during 0.x; see [STABILITY.md](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md).
 - The libraries of Excel (`excelExporter`) and PDF (`pdfExporter`, `pdfmake` + the embedded Roboto font) are loaded dynamically only on first use; the build of an application that never imports `@datatablex/react/excel` or `@datatablex/react/pdf` does not see them. With four or fewer visible columns the page is portrait A4, with more it is landscape A4.
 
 **On both paths:**
@@ -306,7 +306,7 @@ await table.exportData("pdf", "currentPage", { title: "Access logs" });
 - The order and the set of columns come from the user's visible `columnState`; columns that are `hidden` or `exportable: false` are not written. This is not an access control: on the server path the boundary is `export.fields`, and not sending sensitive data to the browser at all is the responsibility of the backend or view.
 - CSV is written with a UTF-8 BOM and with every cell quoted in the RFC 4180 style; text that starts with a formula character is safely prefixed with `'`. In Excel, text cells are written as strings.
 
-For the wire contract of the server path, see the [`@datatablex/fastify` README](https://github.com/ersinozdemir/datatablex/blob/main/packages/fastify/README.md) ("Server export") and [`@datatablex/core`](https://www.npmjs.com/package/@datatablex/core).
+For the wire contract of the server path, see the [`@datatablex/fastify` README](https://github.com/ersinozdmr/datatablex/blob/main/packages/fastify/README.md) ("Server export") and [`@datatablex/core`](https://www.npmjs.com/package/@datatablex/core).
 
 ## License
 
