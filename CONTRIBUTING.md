@@ -27,8 +27,26 @@ Run these from the repository root:
 | `pnpm test`           | Runs the unit tests                                     |
 | `pnpm check`          | Runs typecheck, lint and test                           |
 | `pnpm check:language` | Checks that Turkish text stays in the allowlisted files |
+| `pnpm size`           | Checks the gzip size of each build against its budget   |
+| `pnpm smoke`          | Installs the packed packages into clean projects        |
+
+`pnpm size` and `pnpm smoke` need a build first (`pnpm build`). The smoke test also type-checks the code examples of the root `README.md`, so an example that no longer matches the API fails there.
 
 CI runs the same checks on every pull request.
+
+## End-to-end tests
+
+The end-to-end tests drive the [example application](apps/example) in a real browser against a real PostgreSQL database. Docker provides the database:
+
+```sh
+pnpm build
+pnpm --filter example db:up              # starts PostgreSQL on port 55432
+cp apps/example/.env.example apps/example/.env
+pnpm --filter example playwright:install # once, downloads the browser
+pnpm --filter example test:e2e           # migrates, seeds, builds the client and runs Playwright
+```
+
+`test:e2e` re-creates the example data on every run. The example application uses the built output of the packages, so rebuild (`pnpm build`) after changing a package.
 
 ## Pull requests
 
