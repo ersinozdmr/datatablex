@@ -156,12 +156,12 @@ The [example application](apps/example) is a complete setup on a real PostgreSQL
 
 ## Packages
 
-| Package                                   | What it is                                                                                 |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`@datatablex/core`](packages/core)       | The wire contract: query, result and filter types, plus zero-dependency helpers            |
-| [`@datatablex/fastify`](packages/fastify) | The backend: allowlisted endpoint config, query validation, SQL translation, server export |
-| [`@datatablex/react`](packages/react)     | The headless layer: `useDataTable`, REST and local data sources, URL sync, export          |
-| [`@datatablex/antd`](packages/antd)       | The Ant Design components: `<DataTable>`, filter bar, column menu, export menu             |
+| Package                                   | Version                                                                                                           | What it is                                                                                 |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`@datatablex/core`](packages/core)       | [![npm](https://img.shields.io/npm/v/@datatablex/core.svg)](https://www.npmjs.com/package/@datatablex/core)       | The wire contract: query, result and filter types, plus zero-dependency helpers            |
+| [`@datatablex/fastify`](packages/fastify) | [![npm](https://img.shields.io/npm/v/@datatablex/fastify.svg)](https://www.npmjs.com/package/@datatablex/fastify) | The backend: allowlisted endpoint config, query validation, SQL translation, server export |
+| [`@datatablex/react`](packages/react)     | [![npm](https://img.shields.io/npm/v/@datatablex/react.svg)](https://www.npmjs.com/package/@datatablex/react)     | The headless layer: `useDataTable`, REST and local data sources, URL sync, export          |
+| [`@datatablex/antd`](packages/antd)       | [![npm](https://img.shields.io/npm/v/@datatablex/antd.svg)](https://www.npmjs.com/package/@datatablex/antd)       | The Ant Design components: `<DataTable>`, filter bar, column menu, export menu             |
 
 The packages are released together and share one version number; install the same version of each.
 
