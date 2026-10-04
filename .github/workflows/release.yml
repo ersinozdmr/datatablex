@@ -5,9 +5,18 @@ name: Release
 # It is started by hand from the Actions tab, after the pull request that sets the new versions
 # (`pnpm changeset version`) has been merged. Publishing uses npm trusted publishing: the job proves its
 # identity to npm with a short-lived OIDC token, so no npm token is stored in this repository. Each package
-# names this workflow file as its trusted publisher in its settings on npmjs.com.
+# names this workflow file as its trusted publisher in its settings on npmjs.com. npm attaches a provenance
+# statement to a package published this way from a public repository.
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: npm dist-tag to publish under. Use "next" for a release candidate.
+        type: choice
+        options:
+          - latest
+          - next
+        default: latest
 
 concurrency: release
 
@@ -52,7 +61,7 @@ jobs:
 
       - name: Publish to npm
         # Publishes every package whose version is not on the registry yet and creates a git tag for each.
-        run: pnpm changeset publish
+        run: pnpm changeset publish --tag "${{ inputs.tag }}"
 
       - name: Push the version tags
         run: git push origin --tags

@@ -24,8 +24,7 @@
     "url": "https://github.com/ersinozdmr/datatablex/issues"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "type": "module",
   "exports": {
