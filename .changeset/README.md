@@ -4,4 +4,4 @@ This folder holds the pending release notes. A changeset is a small Markdown fil
 
 Add one with `pnpm changeset` in every pull request that changes a published package. For a change that needs no release, such as a test or an internal refactor, add an empty one with `pnpm changeset --empty`.
 
-The four packages are released together and always share one version.
+The four packages are released together and always share one version. `@datatablex/antd` accepts any `0.x` version of its sibling packages as a peer, which keeps a minor release from being turned into a major one for every package.

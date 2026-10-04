@@ -8,13 +8,13 @@ The Ant Design v5 interface of DataTableX: `<DataTable>`, a filter bar and an ad
 npm install @datatablex/antd @datatablex/react @datatablex/core antd react react-dom
 ```
 
-`@datatablex/react`, `@datatablex/core`, `antd`, `react` and `react-dom` are **peer dependencies**: your application must have exactly ONE copy of each (the error classes and the hook of `@datatablex/react` are shared between your application and this package). The command above installs all of them. If you upgrade `@datatablex/react` later, a `^0.x` range covers patch releases only, so move `@datatablex/antd` to the same minor.
+`@datatablex/react`, `@datatablex/core`, `antd`, `react` and `react-dom` are **peer dependencies**: your application must have exactly ONE copy of each (the error classes and the hook of `@datatablex/react` are shared between your application and this package). The command above installs all of them. The four `@datatablex/*` packages are released together with one version number, and only packages with the same version are tested together: install the same version of each and upgrade them together. The peer range accepts any `0.x` version, so your package manager will not stop a mismatch.
 
-| Peer                                     | Supported range                                  |
-| ---------------------------------------- | ------------------------------------------------ |
-| `@datatablex/react` / `@datatablex/core` | `^` (the patch range of the version you install) |
-| `react` / `react-dom`                    | `^18.2.0 \|\| ^19.0.0`                           |
-| `antd`                                   | `^5.20.0`                                        |
+| Peer                                     | Supported range                                              |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| `@datatablex/react` / `@datatablex/core` | `>=0.1.0 <1.0.0`; use the same version as `@datatablex/antd` |
+| `react` / `react-dom`                    | `^18.2.0 \|\| ^19.0.0`                                       |
+| `antd`                                   | `^5.20.0`                                                    |
 
 Ant Design 5 is supported. Ant Design 6 is not supported yet.
 

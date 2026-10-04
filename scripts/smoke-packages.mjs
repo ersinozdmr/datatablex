@@ -155,7 +155,7 @@ export const Options = () => <DataTable<Row> dataSource={dataSource} columns={co
     check(true, `antd (${label}): consumer code and the README examples passed type checking with tsc`);
   }
 
-  // 3. skew - the patch version of react differs from the one antd was built against (in 0.x, `^0.1.0` covers only the patch).
+  // 3. skew - the version of react differs from the one antd was built against; antd's peer range must accept it.
   const bumpedReact = path.join(work, "datatablex-react-skew.tgz");
   const unpacked = path.join(work, "skew-react");
   mkdirSync(unpacked, { recursive: true });
@@ -175,8 +175,8 @@ export const App = () => <DataTable dataSource={createLocalDataSource([{ id: 1 }
   });
   const antdManifest = JSON.parse(readFileSync(path.join(skew, "node_modules/@datatablex/antd/package.json"), "utf8"));
   check(
-    !antdManifest.dependencies?.["@datatablex/react"] && /^\^/.test(antdManifest.peerDependencies?.["@datatablex/react"] ?? ""),
-    "skew: antd requires react as a peer (caret range)",
+    !antdManifest.dependencies?.["@datatablex/react"] && Boolean(antdManifest.peerDependencies?.["@datatablex/react"]),
+    "skew: antd requires react as a peer, not as a dependency",
     JSON.stringify({ dependencies: antdManifest.dependencies, peer: antdManifest.peerDependencies?.["@datatablex/react"] }),
   );
   check(

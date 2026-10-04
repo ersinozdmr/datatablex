@@ -5,7 +5,7 @@ This policy applies from the first published release.
 ## Versioning
 
 - The packages follow SemVer and are released with Changesets. They are in `0.x`: a range such as `^0.1.0` covers patch releases only, and a breaking change may ship in a minor release. That is not a licence to break things; the table below says how each part of the surface may change.
-- The packages depend on each other with caret ranges: `@datatablex/antd` has `@datatablex/react` and `@datatablex/core` as peer dependencies, and `@datatablex/react` and `@datatablex/fastify` depend on `@datatablex/core`. Upgrade them together: packages on the same `0.x` minor work with each other.
+- The four packages are released together and share one version number. `@datatablex/react` and `@datatablex/fastify` depend on `@datatablex/core` with a caret range. `@datatablex/antd` has `@datatablex/react` and `@datatablex/core` as peer dependencies and accepts any `0.x` version of them, so the package manager does not stop a mismatch. Only packages with the same version are tested together: install the same version of each and upgrade them together.
 - Adding an error code, a locale key, an optional option or an optional `TableInstance` member is a minor change.
 
 ## Surface classes

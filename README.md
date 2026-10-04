@@ -163,7 +163,7 @@ The [example application](apps/example) is a complete setup on a real PostgreSQL
 | [`@datatablex/react`](packages/react)     | The headless layer: `useDataTable`, REST and local data sources, URL sync, export          |
 | [`@datatablex/antd`](packages/antd)       | The Ant Design components: `<DataTable>`, filter bar, column menu, export menu             |
 
-The packages are released together and depend on each other with caret ranges; install the same version of each.
+The packages are released together and share one version number; install the same version of each.
 
 ## Compatibility
 

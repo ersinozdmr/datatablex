@@ -56,8 +56,8 @@
     "lint": "eslint ."
   },
   "peerDependencies": {
-    "@datatablex/core": "workspace:^",
-    "@datatablex/react": "workspace:^",
+    "@datatablex/core": "workspace:>=0.1.0 <1.0.0",
+    "@datatablex/react": "workspace:>=0.1.0 <1.0.0",
     "antd": "^5.20.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
