@@ -76,10 +76,10 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/pdfkit": "^0.17.6",
+    "@types/pdfkit": "^0.17.7",
     "exceljs": "^4.4.0",
-    "fastify": "^5.2.0",
-    "kysely": "^0.28.17",
+    "fastify": "^5.12.7",
+    "kysely": "^0.28.18",
     "pdfkit": "^0.20.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
