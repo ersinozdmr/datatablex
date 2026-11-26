@@ -139,7 +139,7 @@ export function ValueEditor<T>({ column, operator, value, maxInValues, onChange,
     case "date":
       if (arity === "pair") {
         return (
-          <Space direction="vertical" size={4} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={4} style={{ width: "100%" }}>
             <Input type="date" aria-label={locale.dateFromInput(columnLabel(column))} value={typeof pair[0] === "string" ? pair[0] : ""} onChange={(e) => setPair(0, e.target.value || undefined)} onPressEnter={onEnter} />
             <Input type="date" aria-label={locale.dateToInput(columnLabel(column))} value={typeof pair[1] === "string" ? pair[1] : ""} onChange={(e) => setPair(1, e.target.value || undefined)} onPressEnter={onEnter} />
           </Space>
@@ -174,7 +174,7 @@ export function ValueEditor<T>({ column, operator, value, maxInValues, onChange,
     case "boolean":
       return (
         <Radio.Group aria-label={label} value={typeof value === "boolean" ? String(value) : undefined} onChange={(e) => onChange(e.target.value === "true")}>
-          <Space direction="vertical" size={0}>
+          <Space orientation="vertical" size={0}>
             <Radio value="true">{locale.yes}</Radio>
             <Radio value="false">{locale.no}</Radio>
           </Space>

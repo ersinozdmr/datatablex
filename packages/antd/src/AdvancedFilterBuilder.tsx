@@ -164,7 +164,7 @@ function GroupEditor<T>({ group, depth, parent, index, ctx }: { group: DraftGrou
           />
         </div>
       ) : null}
-      <Space direction="vertical" size={4} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={4} style={{ width: "100%" }}>
         {group.children.map((child: DraftNode, i) => (
           <div key={child.id} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
             <div style={{ width: 84, flex: "none", paddingTop: 5 }}>
@@ -358,12 +358,12 @@ export function AdvancedFilterBuilder<T>({ table, columns, maxRules, maxDepth, m
       aria-label={locale.advancedFilter}
       style={{ border: `1px solid ${token.colorBorder}`, borderRadius: token.borderRadiusLG, padding: 12 }}
     >
-      <Space direction="vertical" size={8} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={8} style={{ width: "100%" }}>
         {stale ? (
           <Alert
             type="warning"
             showIcon
-            message={locale.filtersChangedElsewhere}
+            title={locale.filtersChangedElsewhere}
             action={
               <Button size="small" onClick={reload}>
                 {locale.reloadDraft}

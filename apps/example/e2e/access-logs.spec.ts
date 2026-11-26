@@ -52,16 +52,16 @@ async function openFieldFilter(page: Page, title: string) {
  * Ant Design `Select`: opens the combobox and picks the option from the
  * dropdown list the combobox is linked to through `aria-controls`.
  *
- * - The click goes to the `.ant-select-selector` that wraps the input, not to
- *   the input itself: the `span` that shows the selected value sits on top of
- *   the input. `force` is not used, because it skips Playwright's visibility and
+ * - The click goes to the `.ant-select` root that wraps the input, not to
+ *   the input itself: the element that shows the placeholder or the selected
+ *   value sits on top of the input. `force` is not used, because it skips Playwright's visibility and
  *   stability waits during the popover's opening animation and fails with an
  *   "outside of the viewport" error.
  * - Taking the option from "the last visible list" could catch another list
  *   that is still in its closing animation and make the test flaky.
  */
 async function pick(page: Page, combobox: Locator, option: string) {
-  await combobox.locator("xpath=ancestor::div[contains(concat(' ', normalize-space(@class), ' '), ' ant-select-selector ')][1]").click();
+  await combobox.locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' ant-select ')][1]").click();
   const listId = await combobox.getAttribute("aria-controls");
   await page.locator(`.ant-select-dropdown:has([id="${listId}"])`).getByTitle(option, { exact: true }).click();
 }
@@ -80,7 +80,14 @@ async function openWithStadium(page: Page, text: string) {
 
 async function exportAs(page: Page, scope: string, format: RegExp) {
   await page.getByText("Export", { exact: true }).click();
-  await page.getByText(scope, { exact: true }).click();
+  // The popover opens with a zoom animation. A click that lands while it is still moving can miss the scope option,
+  // and the export then goes out with the default scope (this happened in WebKit under load). The format is picked
+  // only once the chosen scope is checked; a repeated click on a checked option changes nothing.
+  const scopeInput = page.locator("label.ant-segmented-item", { hasText: scope }).locator("input");
+  await expect(async () => {
+    await page.getByText(scope, { exact: true }).click();
+    await expect(scopeInput).toBeChecked({ timeout: 1_000 });
+  }).toPass();
   await page.getByRole("button", { name: format }).click();
 }
 

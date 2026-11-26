@@ -62,10 +62,13 @@ jobs:
       - name: Require a changeset for package changes
         # A pull request that changes a published package must carry a changeset, otherwise the change reaches
         # neither the changelog nor the version number. `pnpm changeset --empty` marks a change that needs no
-        # release. The release pull request itself and dependency update pull requests are exempt.
+        # release. Release pull requests (`changeset-release/main`, and the `release/<version>` branches that carry
+        # an already versioned snapshot, whose changesets have been consumed) and dependency update pull requests
+        # are exempt.
         if: >-
           github.event_name == 'pull_request' &&
           github.head_ref != 'changeset-release/main' &&
+          !startsWith(github.head_ref, 'release/') &&
           github.actor != 'dependabot[bot]'
         run: pnpm changeset status --since=origin/${{ github.base_ref }}
 
@@ -121,3 +124,36 @@ jobs:
         env:
           # Matches the port mapping of the `postgres` service above and `apps/example/.env.example`.
           DATABASE_URL: postgres://datatablex:datatablex@localhost:55432/datatablex_example
+
+  minimum-node:
+    # The job above runs on the Node version in `.nvmrc`. This one checks the oldest version the packages
+    # declare in `engines.node` (keep the two in step): they install, pass their tests, build and load there.
+    concurrency:
+      group: ci-minimum-node-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck, test, build
+        run: pnpm turbo run typecheck test build
+
+      - name: Smoke-install packed tarballs in clean projects
+        run: pnpm smoke
+
+      - name: Test the React packages on React 18
+        # The development dependencies use React 19, the top of the `react` peer range. This step reruns the tests
+        # of the two React packages on React 18, the bottom of that range. The change to the lockfile stays in this job.
+        run: |
+          pnpm --filter @datatablex/react --filter @datatablex/antd add -D react@^18.3.1 react-dom@^18.3.1
+          pnpm turbo run test --filter=@datatablex/react --filter=@datatablex/antd --force

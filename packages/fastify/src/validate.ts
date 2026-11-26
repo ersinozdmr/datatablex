@@ -84,9 +84,9 @@ interface FilterShapeLimits {
   maxInValues: number;
 }
 
-/** Builds a `too_big` zod issue on the `filters` path. */
-function tooBigIssue(maximum: number, message: string): z.ZodIssue {
-  return { code: z.ZodIssueCode.too_big, maximum, type: "array", inclusive: true, path: ["filters"], message };
+/** Builds a `too_big` zod issue for an array that is longer than its limit (`filters` by default). */
+export function tooBigIssue(maximum: number, message: string, path: PropertyKey[] = ["filters"]): z.core.$ZodIssue {
+  return { code: "too_big", maximum, origin: "array", inclusive: true, path, message };
 }
 
 /**
@@ -192,12 +192,12 @@ const isoDateTimeSchema = z
  * @param type - The field type to build the value schema for.
  * @returns A zod schema that accepts a single (non-array) filter value of that type.
  */
-export function valueSchemaFor(type: FieldType): z.ZodTypeAny {
+export function valueSchemaFor(type: FieldType): z.ZodType {
   switch (type) {
     case "text":
       return z.string();
     case "number":
-      return z.number().finite();
+      return z.number();
     case "boolean":
       return z.boolean();
     case "enum":
@@ -238,7 +238,7 @@ function describeValue(value: unknown): string {
 function checkFilterValueTypes<DB, TB extends keyof DB & string>(
   node: FilterGroup,
   fields: Record<string, FieldConfig<DB, TB, never>>,
-  issues: z.ZodIssue[],
+  issues: z.core.$ZodIssue[],
 ): void {
   for (const child of node.filters) {
     if ("filters" in child) {
@@ -262,7 +262,7 @@ function checkFilterValueTypes<DB, TB extends keyof DB & string>(
       const result = schema.safeParse(value);
       if (result.success) return;
       issues.push({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: isMultiValue ? ["filters", child.field, index] : ["filters", child.field],
         message: `Field "${child.field}" has type: "${field.type}" — expected ${EXPECTED_BY_TYPE[field.type]}, received: ${describeValue(value)}`,
       });
@@ -281,7 +281,7 @@ function checkFilterValueTypes<DB, TB extends keyof DB & string>(
 function checkSensitiveLeaves<DB, TB extends keyof DB & string>(
   root: FilterGroup,
   fields: Record<string, FieldConfig<DB, TB, never>>,
-  issues: z.ZodIssue[],
+  issues: z.core.$ZodIssue[],
 ): void {
   const sensitiveColumns = new Set(
     Object.values(fields)
@@ -308,13 +308,13 @@ function checkSensitiveLeaves<DB, TB extends keyof DB & string>(
   const nested = found.find((leaf) => !leaf.direct);
   if (nested) {
     issues.push({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: ["filters", nested.field],
       message: `"${nested.field}" filters a sensitive column — it can only be a direct child of the root AND group (it cannot be under an OR or in a nested group)`,
     });
   } else if (found.length > 1) {
     issues.push({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: ["filters", found[1]!.field],
       message: `a query can contain at most one sensitive filter (found: ${found.map((leaf) => leaf.field).join(", ")})`,
     });
@@ -367,32 +367,35 @@ export function validateDataTableQuery<DB, TB extends keyof DB & string, Ctx ext
   if (body && typeof body === "object" && "filters" in body) {
     checkFilterShapeLimits((body as { filters?: unknown }).filters, { maxFilterDepth, maxFilterCount, maxInValues });
   }
+  // `sorting` is cut by length here too, BEFORE zod: otherwise an oversized array would be validated
+  // element by element (and every failing element would add an issue) before the limit is even looked at.
+  const rawSorting = body && typeof body === "object" ? (body as { sorting?: unknown }).sorting : undefined;
+  if (Array.isArray(rawSorting) && rawSorting.length > maxSortCount) {
+    throw new z.ZodError([tooBigIssue(maxSortCount, `sorting can contain at most ${maxSortCount} items`, ["sorting"])]);
+  }
 
   const query = dataTableQuerySchema.parse(body) as DataTableQuery;
 
-  const issues: z.ZodIssue[] = [];
-  if (query.sorting.length > maxSortCount) {
-    issues.push({ code: z.ZodIssueCode.too_big, maximum: maxSortCount, type: "array", inclusive: true, path: ["sorting"], message: `sorting can contain at most ${maxSortCount} items` });
-  }
+  const issues: z.core.$ZodIssue[] = [];
   // A second key for the same field is dead in ORDER BY (the first one already
   // decides); it is rejected instead of silently dropped so that the client's
   // mistake becomes visible.
   const seenSortFields = new Set<string>();
   query.sorting.forEach((s, index) => {
     if (seenSortFields.has(s.field)) {
-      issues.push({ code: z.ZodIssueCode.custom, path: ["sorting", index, "field"], message: `sorting field "${s.field}" is given more than once` });
+      issues.push({ code: "custom", path: ["sorting", index, "field"], message: `sorting field "${s.field}" is given more than once` });
     }
     seenSortFields.add(s.field);
   });
   if (query.filters) {
     if (filterDepth(query.filters) > maxFilterDepth) {
-      issues.push({ code: z.ZodIssueCode.too_big, maximum: maxFilterDepth, type: "array", inclusive: true, path: ["filters"], message: `filters can be at most ${maxFilterDepth} levels deep` });
+      issues.push({ code: "too_big", maximum: maxFilterDepth, origin: "array", inclusive: true, path: ["filters"], message: `filters can be at most ${maxFilterDepth} levels deep` });
     }
     if (countFilterLeaves(query.filters) > maxFilterCount) {
-      issues.push({ code: z.ZodIssueCode.too_big, maximum: maxFilterCount, type: "array", inclusive: true, path: ["filters"], message: `filters can contain at most ${maxFilterCount} leaves` });
+      issues.push({ code: "too_big", maximum: maxFilterCount, origin: "array", inclusive: true, path: ["filters"], message: `filters can contain at most ${maxFilterCount} leaves` });
     }
     if (maxArrayValueLength(query.filters) > maxInValues) {
-      issues.push({ code: z.ZodIssueCode.too_big, maximum: maxInValues, type: "array", inclusive: true, path: ["filters"], message: `in/notIn can contain at most ${maxInValues} items` });
+      issues.push({ code: "too_big", maximum: maxInValues, origin: "array", inclusive: true, path: ["filters"], message: `in/notIn can contain at most ${maxInValues} items` });
     }
     checkFilterValueTypes(query.filters, config.fields, issues);
     checkSensitiveLeaves(query.filters, config.fields, issues);
@@ -405,10 +408,10 @@ export function validateDataTableQuery<DB, TB extends keyof DB & string, Ctx ext
   const offset = (query.pagination.page - 1) * effectivePageSize;
   if (!Number.isSafeInteger(offset) || offset > maxOffset) {
     const maxPage = Math.floor(maxOffset / effectivePageSize) + 1;
-    issues.push({ code: z.ZodIssueCode.too_big, maximum: maxPage, type: "number", inclusive: true, path: ["pagination", "page"], message: `pagination.page can be at most ${maxPage} at this page size` });
+    issues.push({ code: "too_big", maximum: maxPage, origin: "number", inclusive: true, path: ["pagination", "page"], message: `pagination.page can be at most ${maxPage} at this page size` });
   }
   if (query.search !== undefined && query.search.length > maxSearchLength) {
-    issues.push({ code: z.ZodIssueCode.too_big, maximum: maxSearchLength, type: "string", inclusive: true, path: ["search"], message: `search can be at most ${maxSearchLength} characters` });
+    issues.push({ code: "too_big", maximum: maxSearchLength, origin: "string", inclusive: true, path: ["search"], message: `search can be at most ${maxSearchLength} characters` });
   }
   if (issues.length) throw new z.ZodError(issues);
 

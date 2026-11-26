@@ -14,3 +14,4 @@ packages/antd/src/locale.ts
 packages/antd/src/__tests__/locale.test.tsx
 apps/example/scripts/seed.ts
 apps/example/e2e/access-logs.spec.ts
+.private/**

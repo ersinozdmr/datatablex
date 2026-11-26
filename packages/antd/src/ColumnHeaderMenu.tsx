@@ -232,7 +232,7 @@ export function ColumnHeaderMenu<T>({
     <>
       <SubmenuTitle label={locale.sort} />
       <Divider style={{ margin: "4px 0" }} />
-      <Space direction="vertical" style={{ width: "100%" }} size={0}>
+      <Space orientation="vertical" style={{ width: "100%" }} size={0}>
         <Button
           type="text"
           block
@@ -267,7 +267,7 @@ export function ColumnHeaderMenu<T>({
   );
 
   const menuPanel = (
-    <Space direction="vertical" style={{ width: "100%" }} size={0}>
+    <Space orientation="vertical" style={{ width: "100%" }} size={0}>
       {onFilterShortcut ? (
         <MenuRow
           icon={<FilterIcon />}

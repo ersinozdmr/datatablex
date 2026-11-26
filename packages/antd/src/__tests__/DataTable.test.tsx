@@ -352,7 +352,7 @@ describe("<DataTable> — column management and density", () => {
     const dataSource = createLocalDataSource(wideRows, wideColumns);
     const { container } = render(<TableWithInstance dataSource={dataSource} />);
     await waitFor(() => expect(screen.getByText("Alice")).toBeInTheDocument());
-    expect(container.querySelector(".ant-table-middle")).toBeInTheDocument();
+    expect(container.querySelector(".ant-table-medium")).toBeInTheDocument();
 
     const user = userEvent.setup();
     await user.click(screen.getByText("Compact"));
@@ -517,7 +517,7 @@ describe("<DataTable> — column management and density", () => {
     const { container } = render(<Harness />);
     await waitFor(() => expect(screen.getByText("Alice")).toBeInTheDocument());
 
-    expect(container.querySelector(".ant-table-has-fix-left")).toBeInTheDocument();
+    expect(container.querySelector(".ant-table-has-fix-start")).toBeInTheDocument();
     expect(container.querySelector(".ant-table-fixed-column")).toBeInTheDocument();
     expect(container.querySelector(".ant-table")?.className).toContain("ant-table-scroll-horizontal");
   });
@@ -933,7 +933,7 @@ describe("<DataTable> — 'No' (row number) virtual column", () => {
     await user.click(screen.getByLabelText("No"));
     await waitFor(() => expect(numberCells(container)[0]).toBe("1"));
 
-    await user.click(screen.getByTitle("2"));
+    await user.click(screen.getByLabelText("Page 2"));
     await waitFor(() => expect(screen.getByText("Record 21")).toBeInTheDocument());
     expect(numberCells(container)).toEqual(["21", "22", "23", "24", "25"]);
   });

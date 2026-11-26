@@ -7,6 +7,7 @@ import { isDataTableEndpointMeta } from "@datatablex/core";
 import { datatableRoute } from "../datatableRoute.js";
 import { assertValidEndpointConfig } from "../config.js";
 import { describeDataTableEndpoint } from "../describe.js";
+import { z } from "zod";
 import { openDataTableExport, validateDataTableExportRequest } from "../export.js";
 import { xlsxCellValue } from "../exportWriters/xlsx.js";
 import type { DataTableEndpointConfig, DataTableExportConfig } from "../types.js";
@@ -299,6 +300,18 @@ describe("export scopes", () => {
     expect(await paths({ scope: "selected", keys: ["x"] })).toContainEqual(["keys", 0]);
     expect(await paths({ scope: "selected", keys: [1, 2, 3] })).toContainEqual(["keys"]);
     expect(await paths({ scope: "allFiltered", keys: [1] })).toContainEqual(["keys"]);
+  });
+
+  it("an oversized keys array is rejected by its length, before zod validates its elements", () => {
+    const cfg = config({ maxSelectedKeys: 2 });
+    const keys = Array.from({ length: 100_000 }, () => ({}));
+    try {
+      validateDataTableExportRequest(body({ scope: "selected", keys }), cfg);
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(z.ZodError);
+      expect((err as z.ZodError).issues).toEqual([expect.objectContaining({ code: "too_big", maximum: 2, path: ["keys"] })]);
+    }
   });
 });
 

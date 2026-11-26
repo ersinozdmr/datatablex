@@ -21,6 +21,16 @@ if (typeof window !== "undefined") {
     pseudoElement ? original(element) : original(element, pseudoElement)) as typeof window.getComputedStyle;
 }
 
+// Node 25 and later define a `localStorage` and a `sessionStorage` of their own on `globalThis`. Without
+// `--localstorage-file` they are unusable, and because vitest does not overwrite a global that already exists,
+// they hide jsdom's: `window.localStorage` is `undefined` in the tests. jsdom's own storage is put back.
+const dom = (globalThis as { jsdom?: { window: Pick<Window, "localStorage" | "sessionStorage"> } }).jsdom;
+if (dom) {
+  for (const key of ["localStorage", "sessionStorage"] as const) {
+    Object.defineProperty(globalThis, key, { configurable: true, enumerable: true, writable: true, value: dom.window[key] });
+  }
+}
+
 // AntD reads window.matchMedia (responsive grid) — jsdom doesn't implement it.
 if (typeof window !== "undefined" && !window.matchMedia) {
   window.matchMedia = (query: string) => ({

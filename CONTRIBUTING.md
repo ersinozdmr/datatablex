@@ -6,10 +6,9 @@ By taking part you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Getting started
 
-You need Node 22 (see `.nvmrc`) and pnpm. The pnpm version is pinned in `package.json`; Corepack picks it up:
+You need Node 22 or later and pnpm. `.nvmrc` names the version used for development and the main CI job; CI also runs the tests on Node 22, the lowest version in `engines.node`. The pnpm version is pinned in the `packageManager` field of `package.json`. Install pnpm 10 or later in any way (for example `npm install --global pnpm`, `brew install pnpm` or `winget install pnpm.pnpm`); it switches to the pinned version by itself:
 
 ```sh
-corepack enable
 pnpm install
 ```
 

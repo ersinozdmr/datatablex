@@ -227,6 +227,18 @@ describe("validateDataTableQuery — request limits", () => {
     expect(() => validateDataTableQuery({ ...minimalQuery, sorting: sorting.slice(0, 3) }, baseConfig({ maxSortCount: 3 }))).not.toThrow();
   });
 
+  it("an oversized sorting array is rejected by its length, before zod validates its elements", () => {
+    // Every element is invalid: validated one by one, each would add issues of its own.
+    const sorting = Array.from({ length: 100_000 }, () => ({ field: 1, direction: "sideways" }));
+    try {
+      validateDataTableQuery({ ...minimalQuery, sorting }, baseConfig({ maxSortCount: 3 }));
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(z.ZodError);
+      expect((err as z.ZodError).issues).toEqual([expect.objectContaining({ code: "too_big", maximum: 3, path: ["sorting"] })]);
+    }
+  });
+
   it("throws ZodError when the filter depth exceeds maxFilterDepth", () => {
     const deep = {
       operator: "AND" as const,

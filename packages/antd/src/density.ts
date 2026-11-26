@@ -3,14 +3,15 @@ import type { Density } from "@datatablex/react";
 
 /**
  * Maps each `Density` to a size that Ant Design's `<Table size>` accepts. The
- * table only accepts "large", "middle" and "small"; "compact", "xsmall" and
+ * table only accepts "large", "medium" and "small" (Ant Design 6 renamed
+ * "middle" to "medium"; the `Density` name stays "middle"); "compact", "xsmall" and
  * "mini" do not exist in Ant Design, so all three are mapped onto "small", the
  * smallest native size. The actual visual difference comes from the custom
  * padding values produced by `cellPadding()` below.
  */
-export const ANTD_SIZE_FOR_DENSITY: Record<Density, "large" | "middle" | "small"> = {
+export const ANTD_SIZE_FOR_DENSITY: Record<Density, "large" | "medium" | "small"> = {
   large: "large",
-  middle: "middle",
+  middle: "medium",
   small: "small",
   compact: "small",
   xsmall: "small",

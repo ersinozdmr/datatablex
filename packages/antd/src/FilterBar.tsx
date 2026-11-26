@@ -75,7 +75,7 @@ function RuleEditor<T>({ columns, initial, maxInValues, limitError, onApply, onL
   };
 
   return (
-    <Space ref={rootRef} direction="vertical" size={8} style={{ width: 260 }}>
+    <Space ref={rootRef} orientation="vertical" size={8} style={{ width: 260 }}>
       <Select
         aria-label={locale.filterField}
         placeholder={locale.filterField}
