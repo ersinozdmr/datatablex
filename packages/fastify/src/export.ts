@@ -6,7 +6,7 @@ import type { Kysely } from "kysely";
 import type { DataTableQuery, DataTableServerExportFormat, DataTableServerExportScope } from "@datatablex/core";
 import type { BaseCtx, DataTableEndpointConfig, DataTableExportEvent } from "./types.js";
 import { assertValidEndpointConfig } from "./config.js";
-import { EXPECTED_BY_TYPE, validateDataTableQuery, valueSchemaFor } from "./validate.js";
+import { EXPECTED_BY_TYPE, tooBigIssue, validateDataTableQuery, valueSchemaFor } from "./validate.js";
 import { buildDataTableQuery } from "./handler.js";
 import { resolveLimits } from "./limits.js";
 import { resolveExportConfig } from "./projection.js";
@@ -44,7 +44,7 @@ const PULL_POLL_MS = 50;
 const YIELD_AFTER_MS = 20;
 
 const exportRequestSchema = z.object({
-  query: z.object({}).passthrough(),
+  query: z.looseObject({}),
   format: z.enum(["csv", "excel", "pdf"]),
   scope: z.enum(["allFiltered", "currentPage", "selected"]).default("allFiltered"),
   keys: z.array(z.union([z.string(), z.number()])).optional(),
@@ -108,15 +108,20 @@ export function validateDataTableExportRequest<DB, TB extends keyof DB & string,
   const exportConfig = resolveExportConfig(config);
   if (!exportConfig) throw new Error("[datatablex] Export is disabled on this endpoint (`export` was not provided).");
 
+  // `keys` is cut by length BEFORE zod, for the same reason as `sorting` in `validateDataTableQuery`.
+  const rawKeys = body && typeof body === "object" ? (body as { keys?: unknown }).keys : undefined;
+  if (Array.isArray(rawKeys) && rawKeys.length > exportConfig.maxSelectedKeys) {
+    throw new z.ZodError([tooBigIssue(exportConfig.maxSelectedKeys, `keys can hold at most ${exportConfig.maxSelectedKeys} items`, ["keys"])]);
+  }
   const parsed = exportRequestSchema.parse(body);
-  const issues: z.ZodIssue[] = [];
+  const issues: z.core.$ZodIssue[] = [];
   if (!exportConfig.formats.includes(parsed.format)) {
-    issues.push({ code: z.ZodIssueCode.custom, path: ["format"], message: `Format "${parsed.format}" is not enabled on this endpoint (enabled: ${exportConfig.formats.join(", ")})` });
+    issues.push({ code: "custom", path: ["format"], message: `Format "${parsed.format}" is not enabled on this endpoint (enabled: ${exportConfig.formats.join(", ")})` });
   }
   const allowed = new Set(exportConfig.fields);
   parsed.columns.forEach((column, index) => {
     if (!allowed.has(column.field)) {
-      issues.push({ code: z.ZodIssueCode.custom, path: ["columns", index, "field"], message: `Field "${column.field}" is not enabled for export on this endpoint` });
+      issues.push({ code: "custom", path: ["columns", index, "field"], message: `Field "${column.field}" is not enabled for export on this endpoint` });
     }
   });
 
@@ -126,13 +131,13 @@ export function validateDataTableExportRequest<DB, TB extends keyof DB & string,
   if (parsed.scope === "selected") {
     queryBody = { sorting: raw.sorting ?? [], filters: null, pagination: { page: 1, pageSize: 1 } };
   } else if (parsed.scope === "currentPage") {
-    if (raw.pagination === undefined) issues.push({ code: z.ZodIssueCode.custom, path: ["query", "pagination"], message: "The currentPage scope requires query.pagination" });
+    if (raw.pagination === undefined) issues.push({ code: "custom", path: ["query", "pagination"], message: "The currentPage scope requires query.pagination" });
     queryBody = { ...raw, skipCount: undefined };
   } else {
     queryBody = { ...raw, pagination: { page: 1, pageSize: 1 }, skipCount: undefined };
   }
   if (parsed.scope !== "selected" && parsed.keys !== undefined) {
-    issues.push({ code: z.ZodIssueCode.custom, path: ["keys"], message: "keys can only be sent with the selected scope" });
+    issues.push({ code: "custom", path: ["keys"], message: "keys can only be sent with the selected scope" });
   }
 
   let query: DataTableQuery;
@@ -152,14 +157,11 @@ export function validateDataTableExportRequest<DB, TB extends keyof DB & string,
   if (parsed.scope === "selected") {
     const primaryKey = config.fields[config.primaryKey]!;
     const keys = parsed.keys ?? [];
-    if (!keys.length) issues.push({ code: z.ZodIssueCode.custom, path: ["keys"], message: "The selected scope requires at least one value in keys" });
-    if (keys.length > exportConfig.maxSelectedKeys) {
-      issues.push({ code: z.ZodIssueCode.too_big, maximum: exportConfig.maxSelectedKeys, type: "array", inclusive: true, path: ["keys"], message: `keys can hold at most ${exportConfig.maxSelectedKeys} items` });
-    }
+    if (!keys.length) issues.push({ code: "custom", path: ["keys"], message: "The selected scope requires at least one value in keys" });
     const schema = valueSchemaFor(primaryKey.type);
     keys.forEach((key, index) => {
       if (!schema.safeParse(key).success) {
-        issues.push({ code: z.ZodIssueCode.custom, path: ["keys", index], message: `primary key "${config.primaryKey}" has type: "${primaryKey.type}" — expected ${EXPECTED_BY_TYPE[primaryKey.type]}` });
+        issues.push({ code: "custom", path: ["keys", index], message: `primary key "${config.primaryKey}" has type: "${primaryKey.type}" — expected ${EXPECTED_BY_TYPE[primaryKey.type]}` });
       }
     });
     filters = { operator: "AND", filters: [{ field: config.primaryKey, operator: "in", value: Array.from(new Set(keys)) }] };

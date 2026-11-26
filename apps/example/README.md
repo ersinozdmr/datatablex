@@ -30,10 +30,12 @@ The client sets the header from the role selector at the top of the page. Changi
 # 1) Start Postgres (fixed port 55432, see docker-compose.yml)
 pnpm --filter example db:up
 
-# 2) Create .env
+# 2) Create .env. `cp` works in bash, zsh, Git Bash and PowerShell;
+#    in Windows cmd use: copy apps\example\.env.example apps\example\.env
 cp apps/example/.env.example apps/example/.env
 
-# 3) Build the workspace packages (apps/example depends on them with workspace:*)
+# 3) Install the dependencies and build the workspace packages (apps/example depends on
+#    them with workspace:*). `pnpm build` runs `pnpm install` first, so no separate step is needed.
 pnpm build
 
 # 4) Migrate and seed (~50,000 rows). The seed TRUNCATEs access_logs; it runs only
@@ -52,7 +54,7 @@ pnpm --filter example dev
 
 ```bash
 pnpm --filter example db:up
-cp apps/example/.env.example apps/example/.env   # first time only
+cp apps/example/.env.example apps/example/.env   # first time only (Windows cmd: see step 2 above)
 pnpm build
 pnpm --filter example playwright:install
 pnpm --filter example test:e2e   # migrate + seed + playwright test, in one command

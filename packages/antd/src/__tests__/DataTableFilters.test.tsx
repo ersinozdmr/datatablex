@@ -200,7 +200,7 @@ describe("<DataTable> — the filter bar as the single interface", () => {
     await apply(user);
     await waitFor(() => expect(lastQuery(queries).filters).not.toBeNull());
 
-    await user.click(screen.getByTitle("2")); // Ant Design paginator: page 2
+    await user.click(screen.getByLabelText("Page 2")); // Ant Design paginator: page 2
     await waitFor(() => expect(screen.getByText("Item-a-21")).toBeInTheDocument());
 
     const final = lastQuery(queries);

@@ -170,7 +170,7 @@ The packages are released together and share one version number; install the sam
 | Dependency | Supported                    |
 | ---------- | ---------------------------- |
 | React      | 18 and 19                    |
-| Ant Design | 5 (`^5.20.0`); 6 is not yet  |
+| Ant Design | 6 (`^6.0.0`)                 |
 | Fastify    | 5                            |
 | Kysely     | `>=0.28.17 <0.30.0`          |
 | Node.js    | 22 or later (server package) |

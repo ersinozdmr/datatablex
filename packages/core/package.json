@@ -1,6 +1,6 @@
 {
   "name": "@datatablex/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "DataTableX wire contract: query/result types and zero-dependency helpers shared by frontend and backend.",
   "keywords": [
     "datatable",
@@ -55,8 +55,8 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^4.1.11"
+    "tsup": "^9.0.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.1"
   }
 }

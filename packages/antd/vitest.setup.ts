@@ -12,7 +12,7 @@ afterEach(() => {
   cleanup();
 });
 
-// rc-util's scrollbar measurement calls getComputedStyle(el, "::-webkit-scrollbar");
+// The scrollbar measurement of `@rc-component/util` calls getComputedStyle(el, "::-webkit-scrollbar");
 // jsdom throws "Not implemented" for the pseudo-element argument and prints a
 // stack trace to stderr in every test. Because this noise in the test output
 // masks REAL errors, the pseudo-element argument is swallowed. jsdom does not
@@ -24,10 +24,10 @@ if (typeof window !== "undefined") {
     pseudoElement ? original(element) : original(element, pseudoElement)) as typeof window.getComputedStyle;
 }
 
-// Ant Design's pop-ups (popover, dropdown, select) close through `rc-motion`:
+// Ant Design's pop-ups (popover, dropdown, select) close through `@rc-component/motion`:
 // the "leave" animation ends and the element is hidden with the `*-hidden`
 // class. Because jsdom 29's CSS module recognizes `WebkitAnimation` and
-// `WebkitTransition`, `rc-motion` decides that animations are supported, but
+// `WebkitTransition`, `@rc-component/motion` decides that animations are supported, but
 // jsdom does not run animations, so `animationend` never arrives: a closed menu
 // stays visible in the DOM and role queries keep finding it. Every `render` is
 // therefore wrapped with Ant Design's own switch-off, the `motion: false` token.
@@ -42,6 +42,16 @@ vi.mock("@testing-library/react", async (importOriginal) => {
   return { ...mod, render };
 });
 
+// Node 25 and later define a `localStorage` and a `sessionStorage` of their own on `globalThis`. Without
+// `--localstorage-file` they are unusable, and because vitest does not overwrite a global that already exists,
+// they hide jsdom's: `window.localStorage` is `undefined` in the tests. jsdom's own storage is put back.
+const dom = (globalThis as { jsdom?: { window: Pick<Window, "localStorage" | "sessionStorage"> } }).jsdom;
+if (dom) {
+  for (const key of ["localStorage", "sessionStorage"] as const) {
+    Object.defineProperty(globalThis, key, { configurable: true, enumerable: true, writable: true, value: dom.window[key] });
+  }
+}
+
 // AntD reads window.matchMedia (responsive grid) — jsdom doesn't implement it.
 if (typeof window !== "undefined" && !window.matchMedia) {
   window.matchMedia = (query: string) => ({
@@ -54,6 +64,17 @@ if (typeof window !== "undefined" && !window.matchMedia) {
     removeEventListener: () => {},
     dispatchEvent: () => false,
   }) as unknown as MediaQueryList;
+}
+
+// Ant Design 6 measures elements with `ResizeObserver` (through `@rc-component/resize-observer`), which jsdom does
+// not implement. jsdom does no layout either, so an observer that never reports a size loses nothing.
+if (typeof window !== "undefined" && !("ResizeObserver" in window)) {
+  class NoResizeObserver {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  }
+  Object.defineProperty(globalThis, "ResizeObserver", { configurable: true, writable: true, value: NoResizeObserver });
 }
 
 

@@ -347,7 +347,7 @@ function ColumnManagementPanel<T>({
   };
 
   return (
-    <Space direction="vertical" style={{ minWidth: 220 }}>
+    <Space orientation="vertical" style={{ minWidth: 220 }}>
       {/* Cannot be reordered and does not count toward the "at least one visible column" rule: it is not a data column. */}
       {selection ? (
         <Checkbox checked={selection.visible} onChange={selection.onToggle}>
@@ -508,10 +508,10 @@ function DefaultErrorAlert<T>({ table, error }: { table: TableInstance<T>; error
     <Alert
       type="error"
       showIcon
-      message={locale.errorTitle}
+      title={locale.errorTitle}
       description={<ErrorDescription {...errorText(error, locale)} />}
       action={
-        <Space direction="vertical" size={4}>
+        <Space orientation="vertical" size={4}>
           {!isClientError ? (
             // reload() can be rejected on unmount; if it is not caught it becomes an unhandled rejection.
             <Button size="small" type="primary" onClick={() => void table.reload().catch(() => {})}>
@@ -793,7 +793,7 @@ function DataTableInner<T>({
           // (see `cellPadding`).
           style: { padding: 0 },
         }),
-        // Ant Design's `<Table size>` recognizes only "large"/"middle"/"small"; for
+        // Ant Design's `<Table size>` recognizes only "large"/"medium"/"small"; for
         // "compact"/"xsmall"/"mini" the padding produced by the native CSS (always
         // the same as that of "small", 8px) is NOT ENOUGH. The `<td>` padding is
         // therefore applied by hand HERE according to `density`, from the SAME
@@ -956,7 +956,7 @@ function DataTableInner<T>({
   );
 
   const content = (
-    <Space direction="vertical" style={{ width: "100%" }}>
+    <Space orientation="vertical" style={{ width: "100%" }}>
       {messageContextHolder}
       {/*
         The filter bar and the toolbar share a single row: the bar fills the
@@ -1087,7 +1087,7 @@ function DataTableFromOptions<T>(props: UseDataTableOptions<T> & CommonProps) {
 }
 
 /**
- * The Ant Design v5 data table: a toolbar (search, column management, export),
+ * The Ant Design v6 data table: a toolbar (search, column management, export),
  * a filter bar, sortable and resizable columns, optional row selection and a
  * pagination row, all rendered from a `TableInstance` produced by
  * `useDataTable` from `@datatablex/react`.

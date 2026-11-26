@@ -1,6 +1,6 @@
 # @datatablex/antd
 
-The Ant Design v5 interface of DataTableX: `<DataTable>`, a filter bar and an advanced filter builder, a column header menu, column management and an export menu. State and data access live in the `useDataTable` hook of [`@datatablex/react`](https://github.com/ersinozdmr/datatablex/blob/main/packages/react/README.md); this package only renders its public contract (`TableInstance`).
+The Ant Design v6 interface of DataTableX: `<DataTable>`, a filter bar and an advanced filter builder, a column header menu, column management and an export menu. State and data access live in the `useDataTable` hook of [`@datatablex/react`](https://github.com/ersinozdmr/datatablex/blob/main/packages/react/README.md); this package only renders its public contract (`TableInstance`).
 
 ## Installation
 
@@ -14,15 +14,11 @@ npm install @datatablex/antd @datatablex/react @datatablex/core antd react react
 | ---------------------------------------- | ------------------------------------------------------------ |
 | `@datatablex/react` / `@datatablex/core` | `>=0.1.0 <1.0.0`; use the same version as `@datatablex/antd` |
 | `react` / `react-dom`                    | `^18.2.0 \|\| ^19.0.0`                                       |
-| `antd`                                   | `^5.20.0`                                                    |
+| `antd`                                   | `^6.0.0`                                                     |
 
-Ant Design 5 is supported. Ant Design 6 is not supported yet.
+Ant Design 6 is supported. Ant Design 5 is not; it works with `@datatablex/antd` 0.1.
 
 > **Version policy:** a minor release may add new keys to `DataTableLocale`. For a full translation use `{ ...enUS, ...overrides }` (a partial `locale` is not affected). Details: [API stability](https://github.com/ersinozdmr/datatablex/blob/main/STABILITY.md).
-
-### If you use React 19
-
-Ant Design v5 is not fully compatible with React 19. If you run on React 19, install [`@ant-design/v5-patch-for-react-19`](https://www.npmjs.com/package/@ant-design/v5-patch-for-react-19) in your application and import it as documented there. This is the responsibility of the consuming application, not of `datatablex`.
 
 ## Usage
 

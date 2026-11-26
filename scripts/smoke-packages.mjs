@@ -23,8 +23,8 @@
 //                 config passes type checking with tsc (NodeNext) in consumer code.
 //                 [Kysely 0.28.17 and 0.29.x]
 //
-// Also runs on Windows: npm/pnpm and the `node_modules/.bin` tools are `.cmd` shells there, and
-// Node (since CVE-2024-27980) does not run a `.cmd` without a shell; the system's bsdtar is used
+// Also runs on Windows: npm and the `node_modules/.bin` tools are `.cmd` shells there (pnpm is a `.cmd` or an
+// `.exe`), and Node (since CVE-2024-27980) does not run a `.cmd` without a shell; the system's bsdtar is used
 // as `tar` (Git's GNU tar takes a `C:\...` path for a remote machine).
 //
 // With SMOKE_REGISTRY_VERSION set (for example `SMOKE_REGISTRY_VERSION=0.1.0 node scripts/smoke-packages.mjs`), the
@@ -48,10 +48,12 @@ const quoteForCmd = (arg) => (/[\s"&|<>^()%!]/.test(arg) ? `"${arg.replace(/"/g,
 const run = (cmd, args, cwd) => {
   const options = { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" };
   // A single command line: passing an argument array together with `shell: true` is deprecated in Node (DEP0190).
-  if (isWindows && cmd.endsWith(".cmd")) return execSync([cmd, ...args].map(quoteForCmd).join(" "), options);
+  // On Windows a `.cmd` shell and a bare command name go through cmd.exe: a bare name such as `pnpm` can be a `.cmd`
+  // shell or an `.exe` (pnpm installed by winget), and cmd.exe resolves either one from PATH.
+  if (isWindows && (cmd.endsWith(".cmd") || !cmd.includes(path.sep))) return execSync([cmd, ...args].map(quoteForCmd).join(" "), options);
   return execFileSync(cmd, args, options);
 };
-/** A package manager or `.bin` tool: a `.cmd` shell on Windows. */
+/** A `node_modules/.bin` tool: a `.cmd` shell on Windows. */
 const tool = (name) => (isWindows ? `${name}.cmd` : name);
 const bin = (dir, name) => path.join(dir, "node_modules", ".bin", tool(name));
 const tar = isWindows ? path.join(process.env.SystemRoot ?? "C:\\Windows", "System32", "tar.exe") : "tar";
@@ -90,8 +92,8 @@ const registryVersion = process.env.SMOKE_REGISTRY_VERSION;
 try {
   mkdirSync(tarballs, { recursive: true });
   for (const pkg of ["core", "react", "antd", "fastify"]) {
-    if (registryVersion) run(tool("npm"), ["pack", `@datatablex/${pkg}@${registryVersion}`, "--pack-destination", tarballs], work);
-    else run(tool("pnpm"), ["pack", "--pack-destination", tarballs], path.join(root, "packages", pkg));
+    if (registryVersion) run("npm", ["pack", `@datatablex/${pkg}@${registryVersion}`, "--pack-destination", tarballs], work);
+    else run("pnpm", ["pack", "--pack-destination", tarballs], path.join(root, "packages", pkg));
   }
   console.log(registryVersion ? `Source: npm registry, version ${registryVersion}` : "Source: workspace build");
   const tgz = Object.fromEntries(
@@ -103,7 +105,7 @@ try {
     const dir = path.join(work, name);
     mkdirSync(dir, { recursive: true });
     writeFileSync(path.join(dir, "package.json"), JSON.stringify({ name: `smoke-${name}`, private: true, type: "module" }));
-    run(tool("npm"), ["install", "--no-audit", "--no-fund", "--loglevel=error", ...packages], dir);
+    run("npm", ["install", "--no-audit", "--no-fund", "--loglevel=error", ...packages], dir);
     for (const [file, source] of Object.entries(files)) writeFileSync(path.join(dir, file), source);
     return dir;
   };
@@ -135,7 +137,7 @@ export function App() {
     // 2. antd (compilation + type checking)
     const antd = project(
       `antd-r${major}`,
-      [tgz.core, tgz.react, tgz.antd, ...reactPackages(major), "antd@5", "esbuild@0.25", "typescript@5", `@types/react@${major}`, `@types/react-dom@${major}`],
+      [tgz.core, tgz.react, tgz.antd, ...reactPackages(major), "antd@6", "esbuild@0.25", "typescript@5", `@types/react@${major}`, `@types/react-dom@${major}`],
       {
         "app.jsx": `import { DataTable, enUS } from "@datatablex/antd";
 import { createLocalDataSource } from "@datatablex/react";
@@ -176,7 +178,7 @@ export const Options = () => <DataTable<Row> dataSource={dataSource} columns={co
   reactManifest.version = `${major}.${minor}.${patch + 1}`;
   writeFileSync(reactManifestPath, JSON.stringify(reactManifest));
   run(tar, ["-czf", bumpedReact, "-C", unpacked, "package"]);
-  const skew = project("skew", [tgz.core, bumpedReact, tgz.antd, ...reactPackages(18), "antd@5", "esbuild@0.25"], {
+  const skew = project("skew", [tgz.core, bumpedReact, tgz.antd, ...reactPackages(18), "antd@6", "esbuild@0.25"], {
     "app.jsx": `import { DataTable } from "@datatablex/antd";
 import { createLocalDataSource } from "@datatablex/react";
 const columns = [{ key: "id", title: "ID" }];

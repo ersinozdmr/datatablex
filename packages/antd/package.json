@@ -1,7 +1,7 @@
 {
   "name": "@datatablex/antd",
-  "version": "0.1.0",
-  "description": "Ant Design v5 components for DataTableX: <DataTable>, a filter bar and an advanced filter builder, a column menu and an export menu.",
+  "version": "0.2.0",
+  "description": "Ant Design v6 components for DataTableX: <DataTable>, a filter bar and an advanced filter builder, a column menu and an export menu.",
   "keywords": [
     "datatable",
     "data-table",
@@ -57,26 +57,26 @@
   "peerDependencies": {
     "@datatablex/core": "workspace:>=0.1.0 <1.0.0",
     "@datatablex/react": "workspace:>=0.1.0 <1.0.0",
-    "antd": "^5.20.0",
+    "antd": "^6.0.0",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "devDependencies": {
     "@datatablex/core": "workspace:*",
     "@datatablex/react": "workspace:*",
-    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/jest-dom": "^8.0.0",
     "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^14.5.2",
+    "@testing-library/user-event": "^14.6.13",
     "@types/node": "^22.19.0",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "antd": "^5.22.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "antd": "^6.7.2",
     "exceljs": "^4.4.0",
-    "jsdom": "^29.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^4.1.11"
+    "jsdom": "^31.0.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tsup": "^9.0.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.1"
   }
 }
